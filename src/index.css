@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  background: #121414;
+}
+
+body {
+  font-family: 'Kanit', sans-serif;
+  color: #d7e2ea;
+}
+
+::selection {
+  background: rgba(182, 0, 168, 0.4);
+  color: #fff;
+}
+
+.hero-heading {
+  background: linear-gradient(180deg, #646973 0%, #bbccd7 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* keep the steel gradient on the cursor-reactive hero heading (per-char clip) */
+.hero-pressure span {
+  background: linear-gradient(180deg, #646973 0%, #bbccd7 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-kerning: none;
+  text-rendering: optimizeSpeed;
+}
+
+/* floating decorative tiles in the About section */
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-16px) rotate(2deg);
+  }
+}
+.float-slow {
+  animation: float-slow 7s ease-in-out infinite;
+}
+.float-slower {
+  animation: float-slow 9s ease-in-out infinite reverse;
+}
+
+/* AI core orb in the hero */
+@keyframes orb-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 60px 10px rgba(182, 0, 168, 0.35),
+      0 0 140px 40px rgba(118, 33, 176, 0.22),
+      inset 0 0 60px rgba(255, 255, 255, 0.08);
+  }
+  50% {
+    box-shadow:
+      0 0 90px 22px rgba(182, 0, 168, 0.5),
+      0 0 190px 60px rgba(118, 33, 176, 0.32),
+      inset 0 0 80px rgba(255, 255, 255, 0.14);
+  }
+}
+.orb-pulse {
+  animation: orb-pulse 4.5s ease-in-out infinite;
+}
+
+@keyframes orb-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.orb-ring {
+  animation: orb-spin 14s linear infinite;
+}
+
+/* expertise rows: number fills with the brand gradient on hover */
+.service-num {
+  transition: opacity 0.3s ease;
+}
+.group:hover .service-num {
+  background: linear-gradient(123deg, #b600a8 20%, #7621b0 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

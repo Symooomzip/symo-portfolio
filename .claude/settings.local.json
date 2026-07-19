@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c ' *)",
+      "PowerShell(Move-Item \"D:\\\\Portffolio\\\\index.html\" \"D:\\\\Portffolio\\\\mockup-v1.html\")",
+      "PowerShell(node --version)",
+      "PowerShell(npm --version)",
+      "Bash(ls -la ~/.claude/skills/ 2>&1 | head -20)"
+    ]
+  }
+}
