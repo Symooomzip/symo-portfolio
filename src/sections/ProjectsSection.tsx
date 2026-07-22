@@ -100,8 +100,8 @@ const PROJECTS: Project[] = [
     chips: ['XGBOOST', 'K-MEANS', 'RFM', 'POWER BI'],
     metric: { kind: 'bar', value: 0.81, display: '0.81', label: 'CHURN AUC-ROC' },
     instrument: 'clusters',
-    instrumentCaption: 'INSTRUMENT: RFM SEGMENTS — 4 CLUSTERS · ANONYMIZED',
-    instrumentTag: 'NO SCREENSHOT — BY DESIGN',
+    instrumentCaption: 'INSTRUMENT: RFM SEGMENTS · K=3',
+    instrumentTag: 'SYNTHETIC COORDINATES — NO CLIENT DATA',
   },
 ];
 
@@ -219,40 +219,112 @@ function SegmentationInstrument() {
   );
 }
 
-const CLUSTER_DOTS: { x: number; y: number; s: number; c: string; o: number }[] = [
-  { x: 18, y: 28, s: 13, c: '#B600A8', o: 1 },
-  { x: 23, y: 38, s: 9, c: '#B600A8', o: 0.75 },
-  { x: 14, y: 44, s: 10, c: '#B600A8', o: 0.6 },
-  { x: 27, y: 24, s: 8, c: '#B600A8', o: 0.5 },
-  { x: 46, y: 60, s: 13, c: '#7621B0', o: 1 },
-  { x: 52, y: 70, s: 9, c: '#7621B0', o: 0.7 },
-  { x: 41, y: 72, s: 10, c: '#7621B0', o: 0.6 },
-  { x: 72, y: 30, s: 13, c: '#BE4C00', o: 1 },
-  { x: 78, y: 40, s: 9, c: '#BE4C00', o: 0.7 },
-  { x: 68, y: 42, s: 8, c: '#BE4C00', o: 0.55 },
-  { x: 80, y: 66, s: 11, c: '#BBCCD7', o: 0.8 },
-  { x: 74, y: 74, s: 8, c: '#BBCCD7', o: 0.5 },
-  { x: 86, y: 58, s: 8, c: '#BBCCD7', o: 0.6 },
+// deterministic PRNG so the "comet" shape is stable across reloads,
+// not reshuffled — this is a stylized fit to the real PCA distribution
+// (dense low-value zone tapering into a sparse high-value fan), not a
+// plot of actual client coordinates.
+function mulberry32(seed: number) {
+  let s = seed;
+  return () => {
+    s |= 0;
+    s = (s + 0x6d2b79f5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+interface ClusterPoint {
+  x: number;
+  y: number;
+  r: number;
+  o: number;
+  c: string;
+}
+
+interface ClusterZone {
+  count: number;
+  xRange: [number, number];
+  yBase: (x: number) => number;
+  spread: number;
+  rRange: [number, number];
+  oRange: [number, number];
+  color: string;
+}
+
+const CLUSTER_ZONES: ClusterZone[] = [
+  { count: 56, xRange: [4, 46], yBase: x => 84 - (x - 4) * 0.18, spread: 3.2, rRange: [0.55, 1.05], oRange: [0.26, 0.48], color: 'rgba(215,226,234,.9)' },
+  { count: 32, xRange: [42, 92], yBase: x => 78 - (x - 42) * 0.5, spread: 5.5, rRange: [0.7, 1.25], oRange: [0.5, 0.8], color: '#7621B0' },
+  { count: 17, xRange: [82, 152], yBase: x => 54 - (x - 82) * 0.5, spread: 9, rRange: [0.9, 1.65], oRange: [0.7, 1], color: '#B600A8' },
+];
+
+function buildClusterField(): ClusterPoint[] {
+  const rand = mulberry32(42);
+  const points: ClusterPoint[] = [];
+
+  CLUSTER_ZONES.forEach(zone => {
+    const [x0, x1] = zone.xRange;
+    for (let i = 0; i < zone.count; i++) {
+      const x = x0 + rand() * (x1 - x0);
+      const growth = zone.spread * (0.4 + (x - x0) / (x1 - x0));
+      const y = zone.yBase(x) + (rand() - 0.5) * growth * 2;
+      const r = zone.rRange[0] + rand() * (zone.rRange[1] - zone.rRange[0]);
+      const o = zone.oRange[0] + rand() * (zone.oRange[1] - zone.oRange[0]);
+      points.push({ x, y, r, o, c: zone.color });
+    }
+  });
+
+  return points;
+}
+
+const CLUSTER_FIELD = buildClusterField();
+
+const CLUSTER_LEGEND: [string, string][] = [
+  ['AT RISK', 'rgba(215,226,234,.8)'],
+  ['LOYAL', '#7621B0'],
+  ['CHAMPIONS', '#B600A8'],
 ];
 
 function ClustersInstrument() {
   return (
     <>
       <div className="absolute inset-0" style={{ background: GRIDLINES }} />
-      {CLUSTER_DOTS.map((d, i) => (
-        <div
-          key={i}
-          className="inst-item absolute rounded-full"
-          style={{
-            left: `${d.x}%`,
-            top: `${d.y}%`,
-            width: d.s,
-            height: d.s,
-            background: d.c,
-            opacity: d.o,
-          }}
-        />
-      ))}
+
+      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 160 100" preserveAspectRatio="none">
+        <g className="cluster-field">
+          {CLUSTER_FIELD.map((p, i) => (
+            <circle key={i} cx={p.x} cy={p.y} r={p.r} fill={p.c} opacity={p.o} />
+          ))}
+        </g>
+      </svg>
+
+      <div className="inst-item absolute left-5 top-5 flex flex-col gap-1.5 sm:left-6 sm:top-6">
+        {CLUSTER_LEGEND.map(([label, color]) => (
+          <div
+            key={label}
+            className="flex items-center gap-2 font-mono text-[9px] tracking-[.2em] text-[#D7E2EA]/60"
+          >
+            <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: color }} />
+            {label}
+          </div>
+        ))}
+      </div>
+
+      <div className="inst-item absolute bottom-4 right-4 w-[104px] rounded-lg border border-[#D7E2EA]/15 bg-[#0c0e0e]/70 px-3 py-2.5 backdrop-blur-sm sm:w-[118px]">
+        <svg viewBox="0 0 100 34" className="h-6 w-full sm:h-7">
+          <polyline
+            points="8,4 22,10 36,16 50,21 64,25 78,28 92,30"
+            fill="none"
+            stroke="rgba(215,226,234,.5)"
+            strokeWidth="1.6"
+          />
+          <line x1="22" y1="2" x2="22" y2="32" stroke="#B600A8" strokeWidth="1" strokeDasharray="2 2" />
+          <circle cx="22" cy="10" r="2" fill="#B600A8" />
+        </svg>
+        <div className="mt-1 font-mono text-[8px] tracking-[.15em] text-[#D7E2EA]/45">
+          K=3 · ELBOW CONFIRMED
+        </div>
+      </div>
     </>
   );
 }
@@ -397,7 +469,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             <div className="absolute right-4 top-4 rounded border border-dashed border-[#D7E2EA]/25 px-2.5 py-1 font-mono text-[9px] tracking-[.2em] text-[#D7E2EA]/40">
               {project.instrumentTag}
             </div>
-            <div className="absolute bottom-4 left-5 font-mono text-[10px] tracking-[.2em] text-[#D7E2EA]/45">
+            <div className="absolute bottom-4 left-5 max-w-[62%] font-mono text-[10px] tracking-[.2em] text-[#D7E2EA]/45 sm:max-w-[70%]">
               {project.instrumentCaption}
             </div>
           </div>
@@ -506,6 +578,11 @@ export default function ProjectsSection() {
             0,
           );
         });
+
+        const clusterField = card.querySelector<SVGGElement>('.cluster-field');
+        if (clusterField) {
+          enter.fromTo(clusterField, { opacity: 0 }, { opacity: 1, duration: 1, ease: 'power2.out' }, 0.1);
+        }
 
         const instItems = card.querySelectorAll<HTMLElement>('.inst-item');
         if (instItems.length) {
