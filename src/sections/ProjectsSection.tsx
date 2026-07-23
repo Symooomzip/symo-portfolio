@@ -4,6 +4,10 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import LiveProjectButton from '../components/LiveProjectButton';
+import ScreenshotCarousel, { type Shot } from '../components/ScreenshotCarousel';
+import { useBorderGlow } from '../hooks/useBorderGlow';
+import { buildGlowStyle } from '../utils/glowPalette';
+import '../components/BorderGlow.css';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -36,6 +40,7 @@ interface Project {
   instrument: InstrumentKind;
   instrumentCaption: string;
   instrumentTag: string;
+  screenshots?: Shot[]; // when present, replaces the instrument with a live-capture carousel
 }
 
 const PROJECTS: Project[] = [
@@ -52,8 +57,14 @@ const PROJECTS: Project[] = [
     chips: ['PYTHON', 'LANGCHAIN', 'CHROMADB', 'LLM'],
     metric: { kind: 'stat', value: 3, display: '3', suffix: '×', label: 'CITED SOURCES / ANSWER' },
     instrument: 'retrieval',
-    instrumentCaption: 'INSTRUMENT: RETRIEVAL TRACE — TOP-3 CITATIONS',
-    instrumentTag: 'SCREENSHOT SLOT — CHAT UI',
+    instrumentCaption: 'LIVE UI · RAG CONSULTATION',
+    instrumentTag: 'LIVE CAPTURE — FR / عربية',
+    screenshots: [
+      { src: '/legal/02-fr-sources.webp', alt: 'Legal assistant — French answer with cited sources' },
+      { src: '/legal/04-arabe-sources.webp', alt: 'Legal assistant — Arabic RTL answer with citations' },
+      { src: '/legal/03-arabe.webp', alt: 'Legal assistant — Arabic consultation' },
+      { src: '/legal/01-accueil.webp', alt: 'Legal assistant — consultation home screen' },
+    ],
   },
   {
     num: '02',
@@ -411,13 +422,21 @@ const INSTRUMENTS: Record<InstrumentKind, () => JSX.Element> = {
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {
   const Instrument = INSTRUMENTS[project.instrument];
+  const { ref: glowRef, onPointerMove } = useBorderGlow<HTMLDivElement>();
 
   return (
     <div className="card-wrapper sticky top-0 flex h-screen items-center justify-center">
       <div
-        className="project-card relative w-full rounded-[40px] border border-[#D7E2EA]/15 bg-[#16181A] p-6 sm:rounded-[50px] sm:p-8 md:rounded-[60px] md:p-10"
-        style={{ top: `calc(-4vh + ${index * 28}px)`, transformOrigin: 'center top' }}
+        ref={glowRef}
+        onPointerMove={onPointerMove}
+        className="project-card glow-card relative w-full rounded-[40px] border border-[#D7E2EA]/15 bg-[#16181A] p-6 sm:rounded-[50px] sm:p-8 md:rounded-[60px] md:p-10"
+        style={{
+          top: `calc(-4vh + ${index * 28}px)`,
+          transformOrigin: 'center top',
+          ...buildGlowStyle(project.accent),
+        }}
       >
+        <span className="glow-edge" />
         {/* header */}
         <div className="flex flex-wrap items-start gap-4 sm:gap-7">
           <div
@@ -465,12 +484,18 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             className="relative order-1 min-h-[240px] overflow-hidden rounded-[24px] sm:min-h-[300px] md:order-2 md:min-h-[340px] md:rounded-[28px]"
             style={{ background: INSTRUMENT_BG[project.instrument] }}
           >
-            <Instrument />
-            <div className="absolute right-4 top-4 rounded border border-dashed border-[#D7E2EA]/25 px-2.5 py-1 font-mono text-[9px] tracking-[.2em] text-[#D7E2EA]/40">
+            {project.screenshots ? (
+              <ScreenshotCarousel shots={project.screenshots} accent={project.accent} />
+            ) : (
+              <>
+                <Instrument />
+                <div className="absolute bottom-4 left-5 max-w-[62%] font-mono text-[10px] tracking-[.2em] text-[#D7E2EA]/45 sm:max-w-[70%]">
+                  {project.instrumentCaption}
+                </div>
+              </>
+            )}
+            <div className="pointer-events-none absolute right-4 top-4 z-10 rounded border border-dashed border-[#D7E2EA]/25 bg-[#0b0d10]/40 px-2.5 py-1 font-mono text-[9px] tracking-[.2em] text-[#D7E2EA]/50">
               {project.instrumentTag}
-            </div>
-            <div className="absolute bottom-4 left-5 max-w-[62%] font-mono text-[10px] tracking-[.2em] text-[#D7E2EA]/45 sm:max-w-[70%]">
-              {project.instrumentCaption}
             </div>
           </div>
 
