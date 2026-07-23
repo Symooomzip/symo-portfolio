@@ -79,8 +79,14 @@ const PROJECTS: Project[] = [
     chips: ['PYTHON', 'MONGODB', 'NLP', 'POWER BI'],
     metric: { kind: 'counter', value: 10, display: '10', suffix: 'K+', label: 'ARTICLES SCRAPED' },
     instrument: 'histogram',
-    instrumentCaption: 'INSTRUMENT: SENTIMENT HISTOGRAM — 10K DOCS',
-    instrumentTag: 'SCREENSHOT SLOT — PBI DASHBOARDS',
+    instrumentCaption: 'LIVE POWER BI · SENTIMENT & MARKET ANALYTICS',
+    instrumentTag: 'LIVE CAPTURE — POWER BI',
+    screenshots: [
+      { src: '/Sentiement/page4.png', alt: 'Power BI dashboard — news sentiment distribution and source analysis' },
+      { src: '/Sentiement/page3.png', alt: 'Power BI dashboard — sentiment comparison across Twitter, news, and Reddit' },
+      { src: '/Sentiement/page%202.png', alt: 'Power BI dashboard — financial market trends, returns, and volatility' },
+      { src: '/Sentiement/page1.png', alt: 'Power BI dashboard — economic indicators by country and period' },
+    ],
   },
   {
     num: '03',
@@ -95,8 +101,12 @@ const PROJECTS: Project[] = [
     chips: ['PYTORCH', 'CNN + TRANSFORMER', 'GRADIO'],
     metric: { kind: 'ring', value: 0.88, display: '0.88', label: 'IoU — TEST SET' },
     instrument: 'segmentation',
-    instrumentCaption: 'INSTRUMENT: SEGMENTATION FIELD',
-    instrumentTag: 'SCREENSHOT SLOT — GRADIO DEMO',
+    instrumentCaption: 'LIVE UI · OSPREY DETECTION CONSOLE',
+    instrumentTag: 'LIVE CAPTURE — CLASSIFY + SEGMENT',
+    screenshots: [
+      { src: '/oilspill/02-segmentation.webp', alt: 'OSPREY console — oil spill segmentation mask and overlay' },
+      { src: '/oilspill/01-classification.webp', alt: 'OSPREY console — oil spill classification with confidence score' },
+    ],
   },
   {
     num: '04',
