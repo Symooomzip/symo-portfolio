@@ -121,8 +121,14 @@ const PROJECTS: Project[] = [
     chips: ['XGBOOST', 'K-MEANS', 'RFM', 'POWER BI'],
     metric: { kind: 'bar', value: 0.81, display: '0.81', label: 'CHURN AUC-ROC' },
     instrument: 'clusters',
-    instrumentCaption: 'INSTRUMENT: RFM SEGMENTS · K=3',
-    instrumentTag: 'SYNTHETIC COORDINATES — NO CLIENT DATA',
+    instrumentCaption: 'LIVE POWER BI · CLV · SEGMENTS · CHURN',
+    instrumentTag: 'ANONYMIZED — DEMO DATA',
+    screenshots: [
+      { src: '/clv/01-clv-overview.webp', alt: 'CLV dashboard — predicted lifetime value overview (anonymized)' },
+      { src: '/clv/02-segments.webp', alt: 'CLV dashboard — RFM customer segmentation (anonymized)' },
+      { src: '/clv/03-churn.webp', alt: 'CLV dashboard — churn risk analysis (anonymized)' },
+      { src: '/clv/04-executive.webp', alt: 'CLV dashboard — executive revenue view (anonymized)' },
+    ],
   },
 ];
 
@@ -476,7 +482,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
               {project.name}
             </h3>
           </div>
-          <div className="flex-none">
+          <div className="order-last w-full sm:order-none sm:w-auto sm:flex-none">
             {project.href ? (
               <LiveProjectButton href={project.href} />
             ) : (
