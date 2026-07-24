@@ -1,6 +1,7 @@
 import FadeIn from '../components/FadeIn';
 import AnimatedText from '../components/AnimatedText';
 
+// NOTE: if you change this, mirror it in functions/_kb.ts (chatbot knowledge base).
 const ABOUT_TEXT =
   "With a Master in Data Science & AI and a degree in Full Stack Development, I build intelligent products end to end — from data pipelines and machine learning models to the web apps that ship them. Let's build something incredible together!";
 

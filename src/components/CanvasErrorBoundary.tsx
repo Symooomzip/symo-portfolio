@@ -1,13 +1,17 @@
 import { Component, type ReactNode } from 'react';
 
 /**
- * Isolates a WebGL/Three.js subtree. If the GPU context is lost or WebGL init
- * throws (common on memory-constrained mobile Safari), this catches the error
- * and renders nothing instead of letting it crash the whole React tree — which
- * is what surfaces as iOS Safari's "a problem repeatedly occurred" reload loop.
+ * Isolates a subtree that is allowed to fail without taking the page with it.
+ *
+ * Originally for WebGL/Three.js — if the GPU context is lost or init throws
+ * (common on memory-constrained mobile Safari), this renders nothing instead
+ * of crashing the whole React tree, which is what surfaces as iOS Safari's
+ * "a problem repeatedly occurred" reload loop. Also used for the chat widget,
+ * where the same reasoning applies: a broken widget should be invisible, not
+ * fatal.
  */
 export default class CanvasErrorBoundary extends Component<
-  { children: ReactNode },
+  { children: ReactNode; label?: string },
   { failed: boolean }
 > {
   state = { failed: false };
@@ -18,7 +22,7 @@ export default class CanvasErrorBoundary extends Component<
 
   componentDidCatch(error: unknown) {
     if (import.meta.env.DEV) {
-      console.warn('NeuralCanvas subtree failed, hiding it:', error);
+      console.warn(`${this.props.label ?? 'NeuralCanvas'} subtree failed, hiding it:`, error);
     }
   }
 

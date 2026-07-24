@@ -3,6 +3,8 @@ import Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import TargetCursor from './components/TargetCursor';
+import ChatWidget from './components/ChatWidget';
+import CanvasErrorBoundary from './components/CanvasErrorBoundary';
 import HeroSection from './sections/HeroSection';
 import MarqueeSection from './sections/MarqueeSection';
 import AboutSection from './sections/AboutSection';
@@ -52,6 +54,10 @@ export default function App() {
       <ExpertiseSection />
       <ProjectsSection />
       <ContactSection />
+      {/* sibling, never a wrapper — TargetCursor walks ancestors for its containing block */}
+      <CanvasErrorBoundary label="ChatWidget">
+        <ChatWidget />
+      </CanvasErrorBoundary>
     </div>
   );
 }

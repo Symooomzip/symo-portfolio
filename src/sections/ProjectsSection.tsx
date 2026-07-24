@@ -43,6 +43,7 @@ interface Project {
   screenshots?: Shot[]; // when present, replaces the instrument with a live-capture carousel
 }
 
+// NOTE: if you change these, mirror them in functions/_kb.ts (chatbot knowledge base).
 const PROJECTS: Project[] = [
   {
     num: '01',

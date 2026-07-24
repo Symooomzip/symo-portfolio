@@ -2,6 +2,7 @@ import FadeIn from '../components/FadeIn';
 import NeuralCanvas from '../components/NeuralCanvas';
 import CanvasErrorBoundary from '../components/CanvasErrorBoundary';
 
+// NOTE: if you change these, mirror them in functions/_kb.ts (chatbot knowledge base).
 const SERVICES = [
   {
     num: '01',

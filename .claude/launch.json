@@ -7,6 +7,31 @@
       "runtimeArgs": ["run", "dev"],
       "port": 5173,
       "autoPort": true
+    },
+    {
+      "name": "portfolio-fullstack",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "wrangler",
+        "pages",
+        "dev",
+        "--port",
+        "8788",
+        "--proxy",
+        "5173",
+        "--",
+        "vite",
+        "--port",
+        "5173",
+        "--strictPort"
+      ],
+      "port": 8788
+    },
+    {
+      "name": "profile-preview",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8899", "--directory", "D:/github-profile"],
+      "port": 8899
     }
   ]
 }
