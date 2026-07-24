@@ -46,13 +46,22 @@ export default function NeuralCanvas({
       /* probe failed; assume hardware */
     }
 
+    const isMobile = window.innerWidth < 768;
+
     const renderer = new THREE.WebGLRenderer({
       canvas,
       alpha: true,
-      antialias: !isSoftware,
+      // MSAA multisampling roughly 4×'s the framebuffer memory — on iOS Safari
+      // (with two canvases live) that's what tips the tab into the
+      // "a problem repeatedly occurred" WebGL out-of-memory crash. Off on mobile.
+      antialias: !isSoftware && !isMobile,
+      powerPreference: isMobile ? 'low-power' : 'default',
     });
     let resScale = isSoftware ? 0.5 : 1;
-    renderer.setPixelRatio(isSoftware ? 1 : Math.min(window.devicePixelRatio, 2));
+    // cap the backing-store resolution: phones report DPR 3, which quadruples
+    // framebuffer memory for no visible gain on a background particle field.
+    const dprCap = isSoftware ? 1 : isMobile ? 1.5 : 2;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, dprCap));
 
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(fogColor ?? (isLight ? 0xffffff : 0x121414), 0.035);
@@ -76,7 +85,6 @@ export default function NeuralCanvas({
     }
     fitViewport();
 
-    const isMobile = window.innerWidth < 768;
     const NODE_COUNT = isLight
       ? isSoftware
         ? 40
@@ -229,6 +237,15 @@ export default function NeuralCanvas({
     let rafId = 0;
     let disposed = false;
 
+    // if the GPU drops our context (iOS does this under memory pressure), stop
+    // the loop cleanly instead of letting Three throw every frame into a crash cycle
+    const onContextLost = (e: Event) => {
+      e.preventDefault();
+      disposed = true;
+      cancelAnimationFrame(rafId);
+    };
+    canvas.addEventListener('webglcontextlost', onContextLost, false);
+
     function animate(time: number) {
       if (disposed) return;
       rafId = requestAnimationFrame(animate);
@@ -364,11 +381,18 @@ export default function NeuralCanvas({
       observer.disconnect();
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('resize', onResize);
-      renderer.dispose();
+      canvas.removeEventListener('webglcontextlost', onContextLost);
+      // free materials + their glow textures (not covered by geometry.dispose)
+      [mainNodes, hubs, pulsePoints, edges].forEach((obj) => {
+        const mat = obj.material as THREE.Material & { map?: THREE.Texture | null };
+        mat.map?.dispose();
+        mat.dispose();
+      });
       nodeGeo.dispose();
       hubGeo.dispose();
       edgeGeo.dispose();
       pulseGeo.dispose();
+      renderer.dispose();
     };
   }, [variant, scrollFade, fogColor]);
 

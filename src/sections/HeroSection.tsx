@@ -2,6 +2,7 @@ import FadeIn from '../components/FadeIn';
 import Magnet from '../components/Magnet';
 import ContactButton from '../components/ContactButton';
 import NeuralCanvas from '../components/NeuralCanvas';
+import CanvasErrorBoundary from '../components/CanvasErrorBoundary';
 
 const NAV_LINKS = [
   { label: 'About', href: '#about' },
@@ -14,7 +15,9 @@ export default function HeroSection() {
   return (
     <section className="relative flex h-screen flex-col" style={{ overflowX: 'clip' }}>
       {/* neural network background */}
-      <NeuralCanvas className="pointer-events-none absolute inset-0 h-full w-full" />
+      <CanvasErrorBoundary>
+        <NeuralCanvas className="pointer-events-none absolute inset-0 h-full w-full" />
+      </CanvasErrorBoundary>
 
       {/* navbar */}
       <FadeIn delay={0} y={-20}>

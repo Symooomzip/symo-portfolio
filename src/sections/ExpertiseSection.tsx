@@ -1,5 +1,6 @@
 import FadeIn from '../components/FadeIn';
 import NeuralCanvas from '../components/NeuralCanvas';
+import CanvasErrorBoundary from '../components/CanvasErrorBoundary';
 
 const SERVICES = [
   {
@@ -46,12 +47,14 @@ export default function ExpertiseSection() {
       className="relative overflow-hidden rounded-t-[40px] bg-[#18011F] px-5 py-20 sm:rounded-t-[50px] sm:px-8 sm:py-24 md:rounded-t-[60px] md:px-10 md:py-32"
     >
       {/* the neural field, glowing over deep plum */}
-      <NeuralCanvas
-        variant="dark"
-        scrollFade={false}
-        fogColor={0x18011f}
-        className="pointer-events-none absolute inset-0 h-full w-full"
-      />
+      <CanvasErrorBoundary>
+        <NeuralCanvas
+          variant="dark"
+          scrollFade={false}
+          fogColor={0x18011f}
+          className="pointer-events-none absolute inset-0 h-full w-full"
+        />
+      </CanvasErrorBoundary>
 
       <div className="relative z-10">
         <FadeIn y={40}>
