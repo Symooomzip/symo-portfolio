@@ -141,8 +141,8 @@ const RING_C = 2 * Math.PI * RING_R;
 function MetricGauge({ metric, accent }: { metric: Metric; accent: string }) {
   if (metric.kind === 'ring') {
     return (
-      <div className="flex items-center gap-4 pt-4">
-        <svg width="104" height="104" viewBox="0 0 120 120" className="flex-none">
+      <div className="flex items-center gap-4 pt-2 sm:pt-4">
+        <svg viewBox="0 0 120 120" className="h-[84px] w-[84px] flex-none sm:h-[104px] sm:w-[104px]">
           <circle cx="60" cy="60" r={RING_R} fill="none" stroke="rgba(215,226,234,.1)" strokeWidth="7" />
           <circle
             className="gauge-ring-fill"
@@ -173,7 +173,7 @@ function MetricGauge({ metric, accent }: { metric: Metric; accent: string }) {
 
   if (metric.kind === 'bar') {
     return (
-      <div className="pt-4">
+      <div className="pt-2 sm:pt-4">
         <div className="mb-2 flex items-baseline justify-between">
           <span className="font-mono text-[10px] tracking-[.15em] text-[#D7E2EA]/45">{metric.label}</span>
           <span className="font-black text-[#D7E2EA]" style={{ fontSize: '15px' }}>
@@ -195,7 +195,7 @@ function MetricGauge({ metric, accent }: { metric: Metric; accent: string }) {
 
   // counter / stat — big number with count-up
   return (
-    <div className="pt-4">
+    <div className="pt-2 sm:pt-4">
       <div
         className="count-up font-black leading-none"
         data-target={metric.value}
@@ -446,7 +446,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       <div
         ref={glowRef}
         onPointerMove={onPointerMove}
-        className="project-card glow-card relative w-full rounded-[40px] border border-[#D7E2EA]/15 bg-[#16181A] p-6 sm:rounded-[50px] sm:p-8 md:rounded-[60px] md:p-10"
+        className="project-card glow-card relative w-full rounded-[32px] border border-[#D7E2EA]/15 bg-[#16181A] p-5 sm:rounded-[50px] sm:p-8 md:rounded-[60px] md:p-10"
         style={{
           top: `calc(-4vh + ${index * 28}px)`,
           transformOrigin: 'center top',
@@ -495,10 +495,10 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         </div>
 
         {/* body: spec column + instrument */}
-        <div className="mt-7 grid gap-6 sm:mt-9 md:grid-cols-[300px_1fr] md:gap-9">
+        <div className="mt-5 grid gap-5 sm:mt-9 sm:gap-6 md:grid-cols-[300px_1fr] md:gap-9">
           {/* instrument first on mobile */}
           <div
-            className="relative order-1 min-h-[240px] overflow-hidden rounded-[24px] sm:min-h-[300px] md:order-2 md:min-h-[340px] md:rounded-[28px]"
+            className="relative order-1 aspect-video overflow-hidden rounded-[24px] sm:aspect-auto sm:min-h-[300px] md:order-2 md:min-h-[340px] md:rounded-[28px]"
             style={{ background: INSTRUMENT_BG[project.instrument] }}
           >
             {project.screenshots ? (
@@ -521,7 +521,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             {project.specs.map((spec) => (
               <div
                 key={spec.label}
-                className="flex items-center justify-between border-b border-[#D7E2EA]/10 py-3.5 font-mono text-[11px] tracking-[.12em]"
+                className="flex items-center justify-between border-b border-[#D7E2EA]/10 py-2.5 font-mono text-[11px] tracking-[.12em] sm:py-3.5"
               >
                 <span className="text-[#D7E2EA]/40">{spec.label}</span>
                 {spec.redacted ? (
@@ -531,7 +531,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
                 )}
               </div>
             ))}
-            <div className="flex flex-wrap gap-2 py-3.5">
+            <div className="flex flex-wrap gap-2 py-2.5 sm:py-3.5">
               {project.chips.map((chip) => (
                 <span
                   key={chip}
