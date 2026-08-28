@@ -20,33 +20,56 @@
 // and the assistant will correctly decline to answer it.
 // ---------------------------------------------------------------------------
 const PERSONAL = {
-  degrees: 'Master in Data Science & AI, plus a degree in Full Stack Development',
-  school: '', // e.g. 'Mundiapolis University, Casablanca'
-  graduation: '', // e.g. 'graduating July 2026'
-  availability: '', // e.g. 'available from September 2026, open to remote and hybrid'
-  yearsExperience: '', // leave empty unless you want a specific number quoted
-  spokenLanguages: 'French, English, Arabic and Moroccan Darija',
+  location: 'Lissasfa, Greater Casablanca, Morocco',
+  availability: 'available immediately',
+  seeking: 'Data Scientist, Data Engineer or AI Developer roles',
+  spokenLanguages: 'Arabic (native), French (fluent), English (fluent), and Moroccan Darija',
+  // Deliberately not published to the assistant: phone number. It is on the CV
+  // people can download, but the bot should not hand it to anonymous visitors.
 };
-
-const OPTIONAL = (label: string, value: string) => (value ? `- ${label}: ${value}\n` : '');
 
 export const KNOWLEDGE = `
 ## Identity
-Mohammed Fakir — Data Scientist, AI Engineer and Full Stack Developer, based in Casablanca, Morocco.
-He builds intelligent products end to end: from data pipelines and machine learning models to the web apps that ship them.
+Mohammed Fakir — Junior Data Scientist and AI Engineer, based in ${PERSONAL.location}.
+Dual profile: software engineering and data science. He builds intelligent products end to end, from ETL pipelines and machine learning models to the web apps that ship them.
+He is ${PERSONAL.availability} and is seeking ${PERSONAL.seeking}.
 
-## Education & languages
-- Degrees: ${PERSONAL.degrees}
-${OPTIONAL('School', PERSONAL.school)}${OPTIONAL('Graduation', PERSONAL.graduation)}${OPTIONAL('Availability', PERSONAL.availability)}${OPTIONAL('Years of experience', PERSONAL.yearsExperience)}- Speaks: ${PERSONAL.spokenLanguages}
+## Education
+- Master's in Data Science & Artificial Intelligence — Mundiapolis University, Casablanca. 2024 to 2026, obtained July 2026.
+- Bachelor's in Applied Computer Science (Development track) — Mundiapolis University, Casablanca. 2021 to 2024.
+- Vocational Baccalaureate (OFPPT) — Ibn Khaldoun High School, Casablanca. 2018 to 2021.
+
+## Languages spoken
+${PERSONAL.spokenLanguages}.
+
+## Professional experience
+Both roles were internships at DISLOG GROUP in Bouskoura, Casablanca-Settat.
+
+### Data Scientist — graduation project internship, DISLOG GROUP (February to July 2026)
+- Built a complete ETL pipeline: extraction, cleaning and centralization of ERP data into a SQL Server data warehouse, working through real-world data quality problems.
+- Customer segmentation with RFM and K-Means to identify actionable customer profiles for marketing and retention.
+- Churn prediction model with XGBoost, reaching approximately 0.81 AUC-ROC.
+- Customer Lifetime Value modeling to prioritize retention actions.
+- Power BI dashboard for customer KPI tracking.
+
+### Full Stack Developer — internship, DISLOG GROUP (April to June 2024)
+- Built a debt collection management application on the MERN stack (MongoDB, Express, React, Node.js).
+- Built a .NET application connected to SQL Server that fixed driver route assignment inconsistencies and automated the removal of illogical trips.
+
+## Certifications
+- IBM "What is Data Science?" — Coursera, 2026
+- Red Hat OpenShift Certification
+- Honoris 21st Century Skills Certificate
 
 ## Skills
-1. Machine Learning — predictive models: churn prediction, customer segmentation, computer vision. scikit-learn, XGBoost, PyTorch, TensorFlow.
-2. Generative AI — LLM systems for production: RAG pipelines with vector databases, fine-tuning with LoRA/PEFT, LangChain orchestration, Hugging Face deployment, ChromaDB.
-3. Data Engineering — ETL pipelines: extraction, cleaning and centralization of raw business data into warehouses. SQL Server, MongoDB, MySQL.
-4. Full Stack Development — production web apps front to back: React, Node.js, .NET, REST APIs. Mobile with Flutter and native Android.
-5. Business Intelligence — Power BI dashboards, data modeling, DAX.
+1. Machine Learning — classification, clustering, prediction, NLP, computer vision. scikit-learn, XGBoost, PyTorch, TensorFlow.
+2. Generative AI — LLM systems for production: RAG pipelines, embeddings and vector databases, fine-tuning with LoRA/PEFT, LangChain orchestration, Hugging Face deployment, ChromaDB.
+3. Data Engineering — ETL, data warehousing, SQL Server, MongoDB, MySQL.
+4. Full Stack Development — React, Node.js, .NET, REST APIs. Mobile with Flutter and native Android/Java.
+5. Business Intelligence — Power BI dashboards, data modeling, DAX, Excel.
 
-Full stack of tools he works with: Python, PyTorch, TensorFlow, scikit-learn, XGBoost, LangChain, Hugging Face, ChromaDB, MongoDB, Power BI, Jupyter, React, Node.js, TypeScript, .NET, SQL Server, MySQL, Docker, Git, Flutter, Java.
+Programming languages: Python, SQL, Java, JavaScript/TypeScript, C, C#, PHP.
+Tools: Git, Docker, Jupyter, VS Code.
 
 ## Projects
 
@@ -55,9 +78,9 @@ A retrieval-augmented assistant over Moroccan law. Answers legal questions in Fr
 Stack: Python, LangChain, ChromaDB, LLM. Corpus: Moroccan legal texts (Constitution, Moudawana, Code des obligations et des contrats, Code pénal).
 Public repo: https://github.com/Symooomzip/AI-Legal-Assistant-Moroccan-Law---RAG-based-System
 
-### 02 — Market Sentiment AI (Big Data, NLP)
-An NLP pipeline that scrapes and analyses market sentiment across news and social feeds — over 10,000 articles collected — and surfaces the results in Power BI dashboards.
-Stack: Python, MongoDB, NLP, Power BI.
+### 02 — Global Markets Sentiment & Financial Analysis (Big Data, NLP), 2025
+A big data pipeline that scraped over 10,000 articles from BBC, Bloomberg and Reuters plus Twitter and Reddit data, enriched with economic indicators (inflation, unemployment, GDP). Sentiment analysis with VADER and TextBlob, surfaced in 4 Power BI dashboards that showed correlations between negative sentiment and short-term market volatility.
+Stack: Python, MongoDB, NLP, Power BI, APIs.
 Public repo: https://github.com/Symooomzip/big-data-bi-project
 
 ### 03 — Oil Spill Detection (Computer Vision)
@@ -70,6 +93,12 @@ Client work for Dislog Group. CLV prediction and churn modeling on a constellati
 Stack: XGBoost, K-Means, RFM, Power BI, SQL Server.
 The repository is private and the client's business data is confidential. The dashboards shown on the portfolio use anonymized demo data.
 
+### Other projects
+- LLM Adaptation & Deployment (2026) — efficient fine-tuning of language models with LoRA/PEFT for domain adaptation, then deploying the adapted models. Hugging Face, PyTorch.
+- Student behaviour detection with YOLOv8 — object detection reaching 0.8 mAP.
+- VNDR — an e-commerce platform on the MERN stack with Stripe payments.
+- Mobile applications — native Android/Java and Flutter.
+
 ## Contact
 - Email: mr.fakir.mohammed@gmail.com
 - LinkedIn: https://linkedin.com/in/mohammed-fakir
@@ -78,13 +107,13 @@ The repository is private and the client's business data is confidential. The da
 
 ## Not in this document
 You do NOT have information about any of the following. If asked, say so plainly and point to his email:
-- Current or past employers, job titles, or employment dates
-- Salary expectations or rates
-- Certifications
-- Published papers
-- References or colleagues
+- Salary expectations, rates, or notice period
+- Academic publications or papers
+- References, or the contact details of former colleagues
+- His phone number or home address — email is the right channel
 - Anything about Dislog Group's business: revenue, customer counts, individual customer data, internal processes, or contract terms
-${PERSONAL.yearsExperience ? '' : '- A total years-of-experience number\n'}${PERSONAL.availability ? '' : '- His exact availability or notice period\n'}`.trim();
+
+On years of experience: do not compute or estimate a total. His experience is the two DISLOG internships listed above, and he graduated in July 2026 — state those facts and let the reader judge.`.trim();
 
 export const SYSTEM_PROMPT = `
 You are the portfolio assistant for Mohammed Fakir, a Data Scientist and AI Engineer. Visitors are usually recruiters or technical interviewers.
