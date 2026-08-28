@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { Github, Linkedin, Mail, MessageCircle, RotateCw, Send, X } from 'lucide-react';
+import { Github, Linkedin, Mail, RotateCw, Send, X } from 'lucide-react';
 
 /* ----------------------------------------------------------------------------
    Floating portfolio assistant. Answers are produced by /api/chat (a Cloudflare
@@ -18,14 +18,17 @@ import { Github, Linkedin, Mail, MessageCircle, RotateCw, Send, X } from 'lucide
 
 const GREETING_ID = 'greeting';
 const GREETING =
-  "Hi — I'm Mohammed's portfolio assistant. Ask me about his projects, his stack, or how to reach him.";
+  "Hi — I'm J.A.R.V.I.S, Mohammed's portfolio assistant. Ask me about his projects, his stack, or how to reach him.";
 
 const SUGGESTIONS = ['What has he built with LLMs?', 'Quel est son stack ?', 'Is he open to work?'];
 
 const MAX_CHARS = 600;
 const HISTORY_LIMIT = 6;
 const STORAGE_KEY = 'mf-chat';
+const HINT_SEEN_KEY = 'mf-chat-hint-seen';
 const TYPE_MS = 18;
+const HINT_DELAY_MS = 2200;
+const HINT_AUTOHIDE_MS = 6000;
 
 const CONTACT = [
   { label: 'mr.fakir.mohammed@gmail.com', href: 'mailto:mr.fakir.mohammed@gmail.com', Icon: Mail },
@@ -65,6 +68,67 @@ function loadStored(): ChatMessage[] {
   }
 }
 
+function seenHint(): boolean {
+  try {
+    return sessionStorage.getItem(HINT_SEEN_KEY) === '1';
+  } catch {
+    return true; // storage unavailable — don't risk pestering with the hint every load
+  }
+}
+
+function markHintSeen() {
+  try {
+    sessionStorage.setItem(HINT_SEEN_KEY, '1');
+  } catch {
+    /* fine if this doesn't persist — worst case the hint reappears next load */
+  }
+}
+
+/**
+ * The FAB's icon when closed: an abstract reactor core, not a literal
+ * message-bubble glyph — a visitor scanning the page notices *movement* in a
+ * way a static icon doesn't get. Two counter-rotating dashed rings around a
+ * breathing center dot; folds to a still ring under reduced-motion.
+ */
+function ReactorCore({ reduceMotion }: { reduceMotion: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+      <motion.circle
+        cx="12"
+        cy="12"
+        r="9.5"
+        stroke="white"
+        strokeOpacity="0.45"
+        strokeWidth="1"
+        strokeDasharray="3 2.4"
+        animate={reduceMotion ? {} : { rotate: 360 }}
+        transition={{ duration: 9, repeat: Infinity, ease: 'linear' }}
+        style={{ transformOrigin: '12px 12px' }}
+      />
+      <motion.circle
+        cx="12"
+        cy="12"
+        r="6.5"
+        stroke="white"
+        strokeWidth="1.2"
+        strokeDasharray="2.2 1.8"
+        animate={reduceMotion ? {} : { rotate: -360 }}
+        transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+        style={{ transformOrigin: '12px 12px' }}
+      />
+      <motion.circle
+        cx="12"
+        cy="12"
+        r="2"
+        fill="white"
+        animate={reduceMotion ? {} : { scale: [1, 1.3, 1], opacity: [0.85, 1, 0.85] }}
+        transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+        style={{ transformOrigin: '12px 12px' }}
+      />
+    </svg>
+  );
+}
+
 export default function ChatWidget() {
   const reduceMotion = useReducedMotion();
 
@@ -81,6 +145,9 @@ export default function ChatWidget() {
   // The hero already owns the bottom-right corner with its "Contact Me" CTA, so
   // the bubble stays out of the way until the visitor scrolls past it.
   const [visible, setVisible] = useState(false);
+  // A once-per-session nudge — most people don't register a corner icon by
+  // itself; a call-out that speaks up (once) is what actually gets noticed.
+  const [hint, setHint] = useState(false);
 
   const abortRef = useRef<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -117,6 +184,23 @@ export default function ChatWidget() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Fire the hint once, a beat after the FAB first appears, and never again
+  // this session — repeating it would read as nagging, not as help.
+  useEffect(() => {
+    if (!visible || open || seenHint()) return;
+    const show = setTimeout(() => {
+      setHint(true);
+      markHintSeen();
+    }, HINT_DELAY_MS);
+    return () => clearTimeout(show);
+  }, [visible, open]);
+
+  useEffect(() => {
+    if (!hint) return;
+    const hide = setTimeout(() => setHint(false), HINT_AUTOHIDE_MS);
+    return () => clearTimeout(hide);
+  }, [hint]);
+
   // typewriter reveal — gives streaming's feel without streaming's error semantics
   useEffect(() => {
     if (!typing) return;
@@ -133,6 +217,11 @@ export default function ChatWidget() {
     setOpen(false);
     abortRef.current?.abort();
     fabRef.current?.focus();
+  }, []);
+
+  const openPanel = useCallback(() => {
+    setOpen(true);
+    setHint(false);
   }, []);
 
   useEffect(() => {
@@ -246,11 +335,11 @@ export default function ChatWidget() {
                 }}
               />
               <div>
-                <div className="font-mono text-[11px] uppercase tracking-widest text-[#D7E2EA]/60">
-                  Portfolio Assistant
+                <div className="font-mono text-[11px] uppercase tracking-[.2em] text-[#D7E2EA]/60">
+                  J.A.R.V.I.S
                 </div>
                 <div className="mt-0.5 text-[11px] text-[#D7E2EA]/35">
-                  Grounded in Mohammed&apos;s CV &amp; projects
+                  Mohammed&apos;s portfolio assistant
                 </div>
               </div>
               <button
@@ -418,13 +507,36 @@ export default function ChatWidget() {
         )}
       </AnimatePresence>
 
+      {/* one-shot discovery nudge, dismissed by opening the chat or by itself after a few seconds */}
+      <AnimatePresence>
+        {hint && !open && (
+          <motion.button
+            type="button"
+            onClick={openPanel}
+            initial={{ opacity: 0, x: 8, scale: 0.96 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 8, scale: 0.96 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+            className="cursor-target fixed bottom-[26px] right-[76px] z-[9020] flex items-center gap-2 whitespace-nowrap rounded-full border border-[#D7E2EA]/15 bg-[#16181A] py-2.5 pl-3.5 pr-3 text-left shadow-lg shadow-black/40 sm:bottom-[38px] sm:right-[92px]"
+          >
+            <span className="font-mono text-[11px] tracking-wide text-[#D7E2EA]/85">
+              Ask J.A.R.V.I.S about Mohammed
+            </span>
+            <span
+              className="h-1.5 w-1.5 flex-none rounded-full"
+              style={{ background: '#B600A8', boxShadow: '0 0 6px 1px rgba(182,0,168,.7)' }}
+            />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
       {/* FAB — always mounted so Escape can return focus to it, and so the ref
           stays stable (a ref on a direct AnimatePresence child warns in React 18) */}
       <motion.button
         ref={fabRef}
         type="button"
-        onClick={() => (open ? closePanel() : setOpen(true))}
-        aria-label={open ? 'Close assistant' : 'Ask about Mohammed'}
+        onClick={() => (open ? closePanel() : openPanel())}
+        aria-label={open ? 'Close assistant' : 'Ask J.A.R.V.I.S about Mohammed'}
         aria-expanded={open}
         aria-hidden={!showFab}
         tabIndex={showFab ? 0 : -1}
@@ -456,7 +568,7 @@ export default function ChatWidget() {
             transition={{ duration: 0.15 }}
             className="grid place-items-center"
           >
-            {open ? <X size={22} /> : <MessageCircle size={22} />}
+            {open ? <X size={22} /> : <ReactorCore reduceMotion={!!reduceMotion} />}
           </motion.span>
         </AnimatePresence>
       </motion.button>
