@@ -448,7 +448,9 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         onPointerMove={onPointerMove}
         className="project-card glow-card relative w-full rounded-[32px] border border-[#D7E2EA]/15 bg-[#16181A] p-5 sm:rounded-[50px] sm:p-8 md:rounded-[60px] md:p-10"
         style={{
-          top: `calc(-4vh + ${index * 28}px)`,
+          // `top` itself lives in index.css so the mobile stack can use a
+          // different step without an !important fight with this inline style
+          ['--i' as string]: index,
           transformOrigin: 'center top',
           ...buildGlowStyle(project.accent),
         }}
@@ -463,9 +465,11 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             {project.num}
           </div>
           <div className="min-w-0 flex-1 pt-1">
-            <div className="mb-1 flex flex-wrap items-center gap-3">
+            <div className="mb-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+              {/* single line on purpose: only the first ~40px of a stacked card
+                  peeks out, so a wrapped eyebrow gets sliced through line two */}
               <span
-                className="font-mono text-[10px] tracking-[.3em]"
+                className="min-w-0 max-w-full truncate font-mono text-[9px] tracking-[.12em] sm:text-[10px] sm:tracking-[.3em]"
                 style={{ color: project.accent }}
               >
                 {project.eyebrow}

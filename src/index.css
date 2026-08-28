@@ -84,6 +84,27 @@ body {
   animation: orb-spin 14s linear infinite;
 }
 
+/* Sticky-stack offsets for the project cards. --i is the card index.
+   Desktop keeps the original centred stack. */
+.project-card {
+  top: calc(-4vh + var(--i) * 28px);
+}
+
+@media (max-width: 639px) {
+  /* Centring cards of unequal height made the peek between them vary from 9px
+     to 40px — one card was effectively invisible, and text got sliced. Anchor
+     to the top instead so the peek is exactly the step, and keep that step
+     smaller than the card's 20px padding so the visible band is clean
+     background rather than a half-cut number. */
+  .card-wrapper {
+    align-items: flex-start;
+    padding-top: 4vh;
+  }
+  .project-card {
+    top: calc(var(--i) * 14px);
+  }
+}
+
 /* expertise rows: number fills with the brand gradient on hover */
 .service-num {
   transition: opacity 0.3s ease;
