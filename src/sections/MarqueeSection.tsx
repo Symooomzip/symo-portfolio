@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useMemo } from 'react';
+import LogoLoop, { type LogoItem } from '../components/LogoLoop';
 
 interface TechItem {
   name: string;
@@ -35,76 +36,53 @@ const ROW_2: TechItem[] = [
   { name: 'Java', icon: `${DEVICON}/java/java-original.svg` },
 ];
 
-function Tile({ item }: { item: TechItem }) {
+function TechChip({ item }: { item: TechItem }) {
   return (
-    <div
-      className="flex h-[170px] w-[280px] flex-shrink-0 flex-col items-center justify-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03]"
-      style={{ willChange: 'transform' }}
-    >
-      {item.icon ? (
-        <img
-          src={item.icon}
-          alt={item.name}
-          loading="lazy"
-          className="h-16 w-16 object-contain"
-        />
-      ) : (
-        <span
-          className="text-3xl font-black uppercase"
-          style={{ color: item.accent ?? '#D7E2EA' }}
-        >
-          {item.name}
-        </span>
-      )}
+    <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 sm:px-5 sm:py-3">
       {item.icon && (
-        <span className="text-sm font-medium uppercase tracking-widest text-[#D7E2EA]/70">
-          {item.name}
-        </span>
+        <img src={item.icon} alt="" aria-hidden className="h-6 w-6 object-contain sm:h-7 sm:w-7" />
       )}
+      <span
+        className="whitespace-nowrap text-[13px] font-medium uppercase tracking-widest sm:text-sm"
+        style={{ color: item.accent ?? 'rgba(215,226,234,.7)' }}
+      >
+        {item.name}
+      </span>
     </div>
   );
 }
 
+const toLogos = (items: TechItem[]): LogoItem[] =>
+  items.map((item) => ({ node: <TechChip item={item} />, ariaLabel: item.name }));
+
 export default function MarqueeSection() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const [offset, setOffset] = useState(0);
-
-  useEffect(() => {
-    const onScroll = () => {
-      const el = sectionRef.current;
-      if (!el) return;
-      const sectionTop = el.offsetTop;
-      setOffset((window.scrollY - sectionTop + window.innerHeight) * 0.3);
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  const row1 = [...ROW_1, ...ROW_1, ...ROW_1];
-  const row2 = [...ROW_2, ...ROW_2, ...ROW_2];
+  // memoised so LogoLoop's memo() holds and its resize/image effects don't
+  // re-run on every parent render
+  const row1 = useMemo(() => toLogos(ROW_1), []);
+  const row2 = useMemo(() => toLogos(ROW_2), []);
 
   return (
-    <section
-      ref={sectionRef}
-      className="flex flex-col gap-3 bg-[#121414] pb-10 pt-24 sm:pt-32 md:pt-40"
-    >
-      <div
-        className="flex gap-3"
-        style={{ transform: `translateX(${offset - 200}px)`, willChange: 'transform' }}
-      >
-        {row1.map((item, i) => (
-          <Tile key={`r1-${i}`} item={item} />
-        ))}
-      </div>
-      <div
-        className="flex gap-3"
-        style={{ transform: `translateX(${-(offset - 200)}px)`, willChange: 'transform' }}
-      >
-        {row2.map((item, i) => (
-          <Tile key={`r2-${i}`} item={item} />
-        ))}
-      </div>
+    <section className="flex flex-col gap-3 overflow-hidden bg-[#121414] pb-10 pt-24 sm:pt-32 md:pt-40">
+      <LogoLoop
+        logos={row1}
+        direction="left"
+        speed={38}
+        gap={12}
+        fadeOut
+        fadeOutColor="#121414"
+        scaleOnHover
+        ariaLabel="Machine learning and data tools"
+      />
+      <LogoLoop
+        logos={row2}
+        direction="right"
+        speed={38}
+        gap={12}
+        fadeOut
+        fadeOutColor="#121414"
+        scaleOnHover
+        ariaLabel="Web, mobile and infrastructure tools"
+      />
     </section>
   );
 }
